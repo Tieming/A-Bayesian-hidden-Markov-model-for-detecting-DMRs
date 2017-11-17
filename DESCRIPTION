@@ -1,0 +1,10 @@
+Package: hmmDMR
+Title: DMR detection by HMM
+Version: 0.1
+Authors@R: person("Tieming", "Ji", email = "jit@missouri.edu", role = c("aut", "cre"))
+Description: This R software implements a Bayesian hidden Markov model for detecting differentially methylated regions using bisulfite sequencing data.
+Depends: R (>= 3.3.3)
+License: GPL-2|GPL-3
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1
