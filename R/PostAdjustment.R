@@ -1,27 +1,16 @@
-#
-# Post Adjustment
-# Goal: (1) Require DMRs to have a minimum length, such as 500 bps.
-#			(2) Require DMRs to contain a minimum number of CpGs, such as 3 CpGs.
-#
-# Tieming, 10/9/2017
-#
-#
-
-
 #' Post Adjustment
 #'
-#' This function selects output from HMM to ensure the minimum length of DMRs and 
-#' minimum number of CpGs in each DMR.
+#' This function adjusts HMM output such that each detected DMR has a minimum length and a minimum number of CpGs in each DMR.
 #'
-#' @param obs Transformed observations for all bins. This is the output from read.process function
-#' @param em.o Parameter estimation and output from HMM
-#' @param CpG.pos CpG positions
-#' @param min.length User-defined minimum DMR length. Default to 200
-#' @param min.CpGs User-defined minimum number of CpGs in each DMR. Default to 3
+#' @param em.o Output from EM function.
+#' @param CpG.pos Contains all CpG positions.
+#' @param min.length Minimum length of a DMR. Default to 200.
+#' @param min.CpGs Minimum number of CpGs contained in a DMR. Default to 3.
+#' @return dmr.res A matrix contains transformed observations for each bin and the adjusted predictions for each bin (0-normal, 1-hyper, 2-hypo).
+#' @return region A matrix contains detected regions satisfying user-defined length and number of CpGs.
 #' @export
-PostAdjustment <- function(obs, em.o, CpG.pos, min.length=200, min.CpGs=3){
-
-		direction <- em.o$state
+PostAdjustment <- function(em.o, CpG.pos, min.length=200, min.CpGs=3){
+		direction <- em.o$res$direction
 		flag <- FALSE
 		region <- data.frame(NULL)
 		region.cnt <- 0
@@ -29,11 +18,11 @@ PostAdjustment <- function(obs, em.o, CpG.pos, min.length=200, min.CpGs=3){
 				if(direction[bin.cnt]!=0 & flag==FALSE){
 						flag <- TRUE
 					    tmp.direction <- direction[bin.cnt]
-					    start.pos <- obs[bin.cnt, "start"]
+					    start.pos <- em.o$res[bin.cnt, "start"]
 					    start.bin <- bin.cnt
 				}else if(direction[bin.cnt]!=0 & flag==TRUE){
 						if(tmp.direction != direction[bin.cnt]){
-								end.pos <- obs[bin.cnt-1, "end"]
+								end.pos <- em.o$res[bin.cnt-1, "end"]
 								end.bin <- bin.cnt-1
 								DMR.length <- end.pos - start.pos
 								num.CpGs <- sum(CpG.pos>=start.pos & CpG.pos<=end.pos)
@@ -47,12 +36,12 @@ PostAdjustment <- function(obs, em.o, CpG.pos, min.length=200, min.CpGs=3){
 										                 region.start=start.pos, region.end=end.pos, 
 										                 region.state, num.CpGs))
 								}
-								start.pos <- obs[bin.cnt, "start"]		
+								start.pos <- em.o$res[bin.cnt, "start"]		
 								start.bin <- bin.cnt
 								tmp.direction <- direction[bin.cnt]
 						}
 						if(tmp.direction == direction[bin.cnt] & bin.cnt==length(direction)){
-								end.pos <- obs[bin.cnt, "end"]
+								end.pos <- em.o$res[bin.cnt, "end"]
 								end.bin <- bin.cnt
 								DMR.length <- end.pos - start.pos
 								num.CpGs <- sum(CpG.pos >= start.pos & CpG.pos <= end.pos)
@@ -70,12 +59,9 @@ PostAdjustment <- function(obs, em.o, CpG.pos, min.length=200, min.CpGs=3){
 						}
 				}else if(direction[bin.cnt]==0 & flag==TRUE){
 						flag <- FALSE
-						end.pos <- obs[bin.cnt-1, "end"]
+						end.pos <- em.o$res[bin.cnt-1, "end"]
 						end.bin <- bin.cnt-1
 						DMR.length <- end.pos - start.pos
-						#cat("DMR.start is ", start.pos, fill=TRUE)
-						#cat("DMR.end is ", end.pos, fill=TRUE)
-						#cat("DMR.length is ", DMR.length, fill=TRUE)
 						num.CpGs <- sum(CpG.pos>=start.pos & CpG.pos<=end.pos)
 						if(DMR.length < min.length | num.CpGs < min.CpGs){
 								direction[start.bin:end.bin] <- 0
@@ -91,7 +77,8 @@ PostAdjustment <- function(obs, em.o, CpG.pos, min.length=200, min.CpGs=3){
 				}		
 		}
 		region$length <- region$region.end - region$region.start
-		dmr.res <- data.frame(obs, direction)
+		em.o$res$direction <- direction
+		dmr.res <- em.o$res
 		return(list(dmr.res=dmr.res, region=region))
 }
 
