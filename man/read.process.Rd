@@ -2,29 +2,27 @@
 % Please edit documentation in R/read.process.R
 \name{read.process}
 \alias{read.process}
-\title{Read and Process Methylation Data into Bins}
+\title{Read and Transform Observed Sequencing Data}
 \usage{
-read.process(start.pos = 1, end.pos = max(pos), pos, norm.m, norm.um, los.m,
-  los.um, bin.size)
+read.process(pos, norm.m, norm.um, abnorm.m, abnorm.um, bin.size = 40)
 }
 \arguments{
-\item{start.pos}{Starting position for data analysis. Default to 1.}
+\item{pos}{CpG positions.}
 
-\item{end.pos}{End position for data analysis. Default to the maximum position in the parameter 'pos'.}
+\item{norm.m}{A matrix contains methylated read count data of normal group. Each column of the matrix represents a replicate and each row represents a CpG position.}
 
-\item{pos}{CpG positions}
+\item{norm.um}{A matrix contains unmethylated read count data of normal group.}
 
-\item{norm.m}{A matrix contains number of methylated reads of the normal group, each column is a biological sample}
+\item{abnorm.m}{A matrix contains methylated read count data of abnormal group.}
 
-\item{norm.um}{A matrix contains number of un-methylated reads of the normal group}
+\item{abnorm.um}{A matrix contains unmethylated read count data of abnormal group.}
 
-\item{los.m}{A matrix contains number of methylated reads of the abnormal group}
-
-\item{los.um}{A matrix contains number of un-methylated reads of the abnormal group}
-
-\item{bin.size}{User-defined bin size. Default to 40}
+\item{bin.size}{Size of a bin. Default to 40.}
+}
+\value{
+obs A matrix contains transformed observations for each bin, distance between the current bin the bin ahead of it, average methylation rate of abnormal and normal groups, start and end position of each bin.
 }
 \description{
-This function reads in CpG methylation data and transforms observations into bins.
-Users define starting position, end position, and bin size.
+This function reads in methylated and unmethylated read count data,
+and transform it into logarithm bin-wise data.
 }

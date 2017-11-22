@@ -4,20 +4,22 @@
 \alias{PostAdjustment}
 \title{Post Adjustment}
 \usage{
-PostAdjustment(obs, em.o, CpG.pos, min.length = 200, min.CpGs = 3)
+PostAdjustment(em.o, CpG.pos, min.length = 200, min.CpGs = 3)
 }
 \arguments{
-\item{obs}{Transformed observations for all bins. This is the output from read.process function}
+\item{em.o}{Output from EM function.}
 
-\item{em.o}{Parameter estimation and output from HMM}
+\item{CpG.pos}{Contains all CpG positions.}
 
-\item{CpG.pos}{CpG positions}
+\item{min.length}{Minimum length of a DMR. Default to 200.}
 
-\item{min.length}{User-defined minimum DMR length. Default to 200}
+\item{min.CpGs}{Minimum number of CpGs contained in a DMR. Default to 3.}
+}
+\value{
+dmr.res A matrix contains transformed observations for each bin and the adjusted predictions for each bin (0-normal, 1-hyper, 2-hypo).
 
-\item{min.CpGs}{User-defined minimum number of CpGs in each DMR. Default to 3}
+region A matrix contains detected regions satisfying user-defined length and number of CpGs.
 }
 \description{
-This function selects output from HMM to ensure the minimum length of DMRs and 
-minimum number of CpGs in each DMR.
+This function adjusts HMM output such that each detected DMR has a minimum length and a minimum number of CpGs in each DMR.
 }
