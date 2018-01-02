@@ -4,16 +4,19 @@
 \alias{PostAdjustment}
 \title{Post Adjustment}
 \usage{
-PostAdjustment(em.o, CpG.pos, min.length = 200, min.CpGs = 3)
+PostAdjustment(em.o, CpG.pos, min.length = 500, min.CpGs = 3,
+  max.gap = 300)
 }
 \arguments{
 \item{em.o}{Output from EM function.}
 
 \item{CpG.pos}{Contains all CpG positions.}
 
-\item{min.length}{Minimum length of a DMR. Default to 200.}
+\item{min.length}{Minimum length of a DMR. Default to 500.}
 
 \item{min.CpGs}{Minimum number of CpGs contained in a DMR. Default to 3.}
+
+\item{max.gap}{Maximum gap between any two CpGs. Default to 300.}
 }
 \value{
 dmr.res A matrix contains transformed observations for each bin and the adjusted predictions for each bin (0-normal, 1-hyper, 2-hypo).
