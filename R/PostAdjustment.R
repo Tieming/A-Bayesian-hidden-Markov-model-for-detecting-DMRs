@@ -4,13 +4,15 @@
 #'
 #' @param em.o Output from EM function.
 #' @param CpG.pos Contains all CpG positions.
-#' @param min.length Minimum length of a DMR. Default to 200.
+#' @param min.length Minimum length of a DMR. Default to 500.
 #' @param min.CpGs Minimum number of CpGs contained in a DMR. Default to 3.
+#' @param max.gap Maximum gap between any two CpGs. Default to 300.
 #' @return dmr.res A matrix contains transformed observations for each bin and the adjusted predictions for each bin (0-normal, 1-hyper, 2-hypo).
 #' @return region A matrix contains detected regions satisfying user-defined length and number of CpGs.
 #' @export
-PostAdjustment <- function(em.o, CpG.pos, min.length=200, min.CpGs=3){
+PostAdjustment <- function(em.o, CpG.pos, min.length=500, min.CpGs=3, max.gap=300){
 		direction <- em.o$res$direction
+		gap <- em.o$res$dist
 		flag <- FALSE
 		region <- data.frame(NULL)
 		region.cnt <- 0
@@ -21,7 +23,8 @@ PostAdjustment <- function(em.o, CpG.pos, min.length=200, min.CpGs=3){
 					    start.pos <- em.o$res[bin.cnt, "start"]
 					    start.bin <- bin.cnt
 				}else if(direction[bin.cnt]!=0 & flag==TRUE){
-						if(tmp.direction != direction[bin.cnt]){
+						if((tmp.direction != direction[bin.cnt]) | 
+						   (tmp.direction == direction[bin.cnt] & gap[bin.cnt] > max.gap)){
 								end.pos <- em.o$res[bin.cnt-1, "end"]
 								end.bin <- bin.cnt-1
 								DMR.length <- end.pos - start.pos
@@ -40,7 +43,8 @@ PostAdjustment <- function(em.o, CpG.pos, min.length=200, min.CpGs=3){
 								start.bin <- bin.cnt
 								tmp.direction <- direction[bin.cnt]
 						}
-						if(tmp.direction == direction[bin.cnt] & bin.cnt==length(direction)){
+						if(tmp.direction == direction[bin.cnt] & 
+						   gap[bin.cnt] <= max.gap & bin.cnt==length(direction)){
 								end.pos <- em.o$res[bin.cnt, "end"]
 								end.bin <- bin.cnt
 								DMR.length <- end.pos - start.pos
@@ -81,7 +85,6 @@ PostAdjustment <- function(em.o, CpG.pos, min.length=200, min.CpGs=3){
 		dmr.res <- em.o$res
 		return(list(dmr.res=dmr.res, region=region))
 }
-
 
 
 
